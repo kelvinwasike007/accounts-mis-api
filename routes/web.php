@@ -14,5 +14,5 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return response()->json(["appVersion"=>$router->app->version()])->header('Content-Type','application/json');
 });
