@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  FRONTEND_DEPLOYMENT:
+  API_DEPLOYMENT:
 
     runs-on: ubuntu-latest
 
