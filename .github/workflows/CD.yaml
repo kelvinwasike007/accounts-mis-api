@@ -1,0 +1,33 @@
+name: DEVOPS @ DEPLOY API
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  FRONTEND_DEPLOYMENT:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - uses: actions/checkout@v2.3.2
+      - run: ls
+      - run: php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+      - run: php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+      - run: php composer-setup.php
+      - run: php -r "unlink('composer-setup.php');"
+      - run: php ./composer.phar install
+      - run: mv environment .env
+      - name: UPLOADING API TO DEPLOYMENT SERVER....
+        uses: SamKirkland/FTP-Deploy-Action@4.2.0
+        with:
+          server: ${{ secrets.SERVER }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          local-dir: ./
+          server-dir: public_html/api/accounts/
