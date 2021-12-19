@@ -2,6 +2,10 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -15,4 +19,31 @@
 
 $router->get('/', function () use ($router) {
     return response()->json(["appVersion"=>$router->app->version()])->header('Content-Type','application/json');
+});
+
+$router->group(['prefix'=>'sync'], function()use($router){
+    $router->post('/upload', function (Request $req)
+    {
+        $collection = $req['dbName'];
+        $documents = $req;
+        $collections = DB::table('collections')->where('collection_name', $collection)->count();
+        if($collections<=0){
+           DB::table('collections')->insert([
+                'collection_name'=>$req["dbName"],
+                'documents'=>json_encode($req["rows"])
+            ]);
+        }else{
+            DB::table('collections')->where('collection_name', $collection)->update([
+                'documents'=>json_encode($req["rows"])
+            ]);
+        }
+        return response()->json(["status"=>"ok", "message"=>'Sync Complete'], 200);
+    });
+    $router->get('/download/{collection_name}', function (Request $req, $collection_name)
+    {
+        $collection = $collection_name;
+        $documents = $req;
+        $collections = DB::table('collections')->where('collection_name', $collection)->value('documents');
+        return response()->json(json_decode($collections), 200);
+    });
 });
