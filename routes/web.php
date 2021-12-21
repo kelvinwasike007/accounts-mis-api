@@ -40,7 +40,7 @@ $router->group(['prefix'=>'sync'], function()use($router){
             
             //compare data
             foreach ($cliData as $document) {
-                if(in_array($document, $dbData)){
+                if(in_array($document, $tmpData)){
 
                 }else{
                     //add new data
