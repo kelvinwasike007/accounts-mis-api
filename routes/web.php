@@ -36,7 +36,7 @@ $router->group(['prefix'=>'sync'], function()use($router){
             //get new data from client
             $cliData = $req["rows"];
             $dbData = DB::table('collections')->where('collection_name', $req['dbName'])->value('documents');
-            $tmpData = json_decode($dbData);
+            $tmpData = $dbData;
             
             //compare data
             foreach ($cliData as $document) {
