@@ -33,8 +33,25 @@ $router->group(['prefix'=>'sync'], function()use($router){
                 'documents'=>json_encode($req["rows"])
             ]);
         }else{
+            //get new data from client
+            $cliData = $req["rows"];
+            $dbData = DB::table('collections')->where('collection_name', $req['dbName'])->value('documents');
+            $tmpData = json_decode($dbData);
+            
+            //compare data
+            foreach ($cliData as $document) {
+                if(in_array($document, $dbData)){
+
+                }else{
+                    //add new data
+                    array_push($tmpData, $document);
+                }
+            }
+            
+
+            //save to collections
             DB::table('collections')->where('collection_name', $collection)->update([
-                'documents'=>json_encode($req["rows"])
+                'documents'=>$tmpData
             ]);
         }
         return response()->json(["status"=>"ok", "message"=>'Sync Complete'], 200);
